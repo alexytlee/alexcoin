@@ -1,6 +1,7 @@
-### Alex Coin 
+# Alex Coin 
 
 ## About
+I simulated a decentralized block chain using node.js and simple javascript. Currently this uses the sha256 hashing method and validation using proofOfWork that validates the blockchain. You can use this to understand the many uses blockchain and why it is so secure.
 
 ## To use
 npm install // to install the dependencies
