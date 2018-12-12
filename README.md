@@ -17,3 +17,5 @@ npm run node_4
 npm run node_5
 
 refer to networkNode.js for the items to push to different routes using Postman
+
+the isValid method validates an entire blockchain for validity
