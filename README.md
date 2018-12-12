@@ -5,7 +5,8 @@ I simulated a decentralized block chain using node.js and simple javascript. Cur
 
 ## To use
 npm install // to install the dependencies
-*** also, have postman installed
+
+I will make a online web visual web interface later in the future.
 
 npm run node_1 // to set up the different nodes
 npm run node_2
