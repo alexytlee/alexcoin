@@ -177,6 +177,77 @@ app.post('/register-nodes-bulk', function(req, res) {
 	res.json({ note: 'Bulk registration successful.' });
 });
 
+// Used to validate the chain
+app.get('/consensus', function(req, res) {
+	const requestPromises = [];
+	alexcoin.networkNodes.forEach(networkNodeUrl => {
+		const requestOptions = {
+			uri: networkNodeUrl + '/blockchain',
+			method: 'GET',
+			json: true
+		};
+		requestPromises.push(rp(requestOptions));
+	});
+
+	Promise.all(requestPromises).then(blockchains => {
+		const currentChainLength = bitcoin.chain.length;
+		let maxChainLength = currentChainLength;
+		let newLongestChain = null;
+		let newPendingTransactions = null;
+		blockchains.forEach(blockchain => {
+			if (blockchain.chain.length > maxChainLength) {
+				// Reset the values if there's a longer chain
+				maxChainLength = blockchain.chain.length;
+				newLongestChain = blockchain.chain;
+				newPendingTransactions = blockchain.pendingTransactions;
+			}
+		});
+		if (!newLongestChain || (newLongestChain && !alexcoin.chainIsValid(newLongestChain))) {
+			res.json({
+				note: 'Current chain has not bee replaced.',
+				chain: bitcoin.chain
+			});
+		} else {
+			alexcoin.chain = newLongestChain;
+			alexcoin.pendingTransactions = newPendingTransactions;
+			res.json({
+				note: 'This chain has been replaced',
+				chain: alexcoin.chain
+			});
+		}
+	});
+});
+
+app.get('/block/:blockHash', function(req, res) {
+	// localhost:3001/block/09128301928309128, so we need to access after the block/
+	const blockHash = req.params.blockHash;
+	const correctBlock = alexcoin.getBlock(blockHash);
+	res.json({
+		block: correctBlock
+	});
+});
+
+app.get('/transaction/:transactionId', function(req, res) {
+	const transactionId = req.params.transactionId;
+	const transactionData = alexcoin.getTransAction(transactionId);
+	res.json({
+		transaction: transactionData.transaction,
+		block: transactionData.transaction
+	});
+});
+
+app.get('/address/:address', function(req, res) {
+	const address = req.params.address;
+	const addressData = alexcoin.getAddressData(address);
+	res.json({
+		addressData: addressData
+	});
+});
+
+app.get('/alex-explorer', function(req, res) {
+	res.sendFile('./alex-explorer/index.html', { root: __dirname });
+});
+
 app.listen(port, function() {
 	console.log(`Listening on port ${port}...`);
 });
